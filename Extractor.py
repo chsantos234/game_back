@@ -1,4 +1,5 @@
 import requests
+from env import env
 
 class Extractor:
 
