@@ -8,10 +8,12 @@ from env import env
 # https://api.isthereanydeal.com/v01/game/plain/id/?key={api-key}&shop=steam&ids=app/{game-steam-id} # get game plain
 # https://api.isthereanydeal.com/v01/game/overview/?key={api-key}&country=BR&shop=steam&ids=app/{game-steam-id} # overview
 
-# https://api.isthereanydeal.com/v01/game/overview/?key=48cf3848edaf5a53d702c5b056b0dcb4be35df34&country=BR&shop=steam&ids=app/675260
-
-# null steam id test on https://www.cheapshark.com/api/1.0/games?title=call%20of%20duty or call of duty
 # https://www.cheapshark.com/api/1.0/deals?id={id-of-deal}
+
+
+# adicionar as funções
+# https://api.isthereanydeal.com/v01/game/plain/id/?key=48cf3848edaf5a53d702c5b056b0dcb4be35df34&shop=steam&ids=app/377160
+# https://api.isthereanydeal.com/v01/game/prices/?key=48cf3848edaf5a53d702c5b056b0dcb4be35df34&plains={game-plains-here}&country=BR&shops=steam
 
 class Extractor:
 
@@ -75,13 +77,26 @@ class Extractor:
 
         return response_id
 
-    def getGameOverview(self,appids:str = None) -> dict:
+    def getGameOverview(self,appids:str = None) -> dict: # botão 1
         response = self.supSteamPoweredExtractor(path="appdetails?",appids=appids,cc="br")
         return response
     
-    def getGameLowest(self,gameid:str = None) -> dict:
+    def getGameLowest(self,gameid:str = None) -> dict: # botão 2
         response = self.supIsThereAnyDealExtractor(path="v01/game/overview/?",key=env("AnyDealKey"),country="BR",shop="steam",ids=f"app/{gameid}")
         return response
+    
+    # https://api.isthereanydeal.com/v01/game/plain/id/?key=48cf3848edaf5a53d702c5b056b0dcb4be35df34&shop=steam&ids=app/377160
+    
+    def getGamePlains(self,gameid:str = None):
+        response = self.supIsThereAnyDealExtractor(path="v01/game/plain/id/?",key=env("AnyDealKey"),shop="steam",ids=f"app/{gameid}")
+        return response
+
+    # https://api.isthereanydeal.com/v01/game/prices/?key=48cf3848edaf5a53d702c5b056b0dcb4be35df34&plains={game-plains-here}&country=BR&shops=steam
+
+    def getGamePrices(self,gamePlain:str = None):
+        response = self.supIsThereAnyDealExtractor(path="v01/game/prices/?",key=env("AnyDealKey"),plains=gamePlain,country="BR")
+        return response
+
 
     def getGameByIds(self,ids:str = None) -> list:
         """
@@ -95,12 +110,4 @@ class Extractor:
         """
         Retorna as informções das lojas presentes na api.
         """
-        return self.supCheapSharkExtractor(paht="stores")
-
-
-
-    # verificar necessidade de stores last change
-
-    # alert path
-
-    # verificar necessidade das funções em alert path
+        return self.supCheapSharkExtractor(path="stores")
