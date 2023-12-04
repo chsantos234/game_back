@@ -1,11 +1,5 @@
 import re
 
-"""
- * Reads configuration from the .env file.
- * 
- * @param key: the key to look for in the .env file 
- * @param default: the default value to return in case key is not found
-"""
 def env(key=None, default=None, **kwargs):
     config = {"filename": '.env'}
     config.update(kwargs)
