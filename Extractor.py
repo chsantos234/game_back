@@ -83,13 +83,13 @@ class Extractor:
     
     # https://api.isthereanydeal.com/v01/game/plain/id/?key={key-here}&shop=steam&ids=app/377160
     
-    def getGamePlains(self,gameid:str = None):
+    def getGamePlains(self,gameid:str = None): # função auxiliar de retornar nome plano
         response = self.supIsThereAnyDealExtractor(path="v01/game/plain/id/?",key=env("AnyDealKey"),shop="steam",ids=f"app/{gameid}")
         return response
 
     # https://api.isthereanydeal.com/v01/game/prices/?key={key-here}&plains={game-plains-here}&country=BR
 
-    def getGamePrices(self,gamePlain:str = None):
+    def getGamePrices(self,gamePlain:str = None): # botão 3
         response = self.supIsThereAnyDealExtractor(path="v01/game/prices/?",key=env("AnyDealKey"),plains=gamePlain,country="BR")
         return response
 
