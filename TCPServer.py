@@ -14,6 +14,15 @@ class Server:
             \nf-list: lista de funções.\
             \ndesc_função: descrição de uma função.\
             \nfunção_params: executa função."
+        
+    def create_response(status_code, body):
+        response = f"HTTP/1.1 {status_code}\r\n"
+        response += "Content-Type: text/html\r\n"
+        response += f"Content-Length: {len(body)}\r\n"
+        response += f"Access-Control-Allow-Origin: *\r\n"
+        response += "\r\n"
+        response += body
+        return response
 
     def register_instance(self, instance):
         for func_name, function in inspect.getmembers(
@@ -38,14 +47,17 @@ class Server:
         return send
 
     def run(self):
+        # criação do socket
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind(self.address)
             s.listen(1)
 
+            # início da conexão
             print(f"servidor {self.address} ativo.")
             client_socket, client_address = s.accept()
             print(f"conexão com: {client_address}")
 
+            # recebimento da mensagem do cliente
             while True:
                 try:
                     resp = (
