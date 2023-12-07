@@ -58,33 +58,34 @@ class Server:
             print(f"conexão com: {client_address}")
             # recebimento da mensagem do cliente
             while True:
-                start_post = False
-                try:
-                    data = client_socket.recv(self.SENDSIZE).decode("utf-8")
-                    if data.startswith("POST"): start_post = True
+                #try:
+                data = client_socket.recv(self.SENDSIZE).decode("utf-8")
+
+                if data.startswith("POST"): #start_post = True
                     resp = data.split("\r\n\r\n", 1)[1].replace('"', '').split('.')
-                    print(f"resp aqui {resp}")
+                    print("//",resp)
                     send = self.response_handler(resp)
+
                 # Tratamentos de erros com envio de mensagens personalizadas
                 #except IndexError:
                 #    send = "Parâmetros estão faltando"
                 #    print(send)
-                except KeyError:
-                    send = "Comando desconhecido"
-                    print(send)
-                except (ValueError, TypeError):
-                    send = (
-                        "Parâmetros de entrada inválidos ou incompletos"
-                    )
-                    print(send)
-                except (ConnectionAbortedError, KeyboardInterrupt):
-                    print(f"Servidor {self.address} interrompido")
-                    s.close()
-                    break
+                #except KeyError:
+                #    send = "Comando desconhecido"
+                #    print(send)
+                #except (ValueError, TypeError):
+                #    send = (
+                #        "Parâmetros de entrada inválidos ou incompletos"
+                #    )
+                #    print(send)
+                #except (ConnectionAbortedError, KeyboardInterrupt):
+                #    print(f"Servidor {self.address} interrompido")
+                #    s.close()
+                #    break
 
                 # envio da resposta para o socket cliente
-                if start_post: 
-                    send = self.create_response(200, str(send))
+
+                send = self.create_response(200, str(send))
                 client_socket.sendall(str(send).encode("utf-8"))
 
 

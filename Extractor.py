@@ -76,7 +76,7 @@ class Extractor:
 
     def getGameOverview(self,appids:str = None) -> dict: # botão 1
         response = self.supSteamPoweredExtractor(path="appdetails?",appids=appids,cc="br")
-        return response
+        return response[appids]["data"]['detailed_description']
     
     def getGameLowest(self,gameid:str = None) -> dict: # botão 2
         response = self.supIsThereAnyDealExtractor(path="v01/game/overview/?",key=env("AnyDealKey"),country="BR",shop="steam",ids=f"app/{gameid}")
