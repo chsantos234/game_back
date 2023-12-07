@@ -12,6 +12,9 @@ from datetime import datetime
 
 # https://www.cheapshark.com/api/1.0/deals?id={id-of-deal}
 
+# https://api.isthereanydeal.com/v01/game/plain/id/?key={key-here}&shop=steam&ids=app/377160
+# https://api.isthereanydeal.com/v01/game/prices/?key={key-here}&plains={game-plains-here}&country=BR
+
 
 class Extractor:
 
@@ -82,8 +85,8 @@ class Extractor:
             price_today = response['data'][f"app/{gameid}"]['price']['price_formatted']
 
         except:
-            store_today = None
-            price_today = None
+            store_today = 'Loja indisponível'
+            price_today = 'Preço indisponível'
 
         store_hist = response['data'][f"app/{gameid}"]['lowest']['store']
         price_hist = response['data'][f"app/{gameid}"]['lowest']['price_formatted']
@@ -103,30 +106,22 @@ class Extractor:
 
         return struct
     
-    # https://api.isthereanydeal.com/v01/game/plain/id/?key={key-here}&shop=steam&ids=app/377160
-    
-    def getGamePlains(self,gameid:str = None): # função auxiliar de retornar nome plano
+    def supGetGamePlains(self,gameid:str = None):
         response = self.supIsThereAnyDealExtractor(path="v01/game/plain/id/?",key=env("AnyDealKey"),shop="steam",ids=f"app/{gameid}")
-        return response
+        return response['data'][f"app/{gameid}"]
 
-    # https://api.isthereanydeal.com/v01/game/prices/?key={key-here}&plains={game-plains-here}&country=BR
-
-    def getGamePrices(self,gamePlain:str = None): # botão 3
+    def supGetGamePrices(self,gamePlain:str = None):
         response = self.supIsThereAnyDealExtractor(path="v01/game/prices/?",key=env("AnyDealKey"),plains=gamePlain,country="BR")
-        return response
 
-    # verificar necessidade:
+        price_list = []
+        try:
+            for i in response['data'][gamePlain]['list']:
+                price_list.append(f"{i['shop']['name']}: R${i['price_old']} -> R${i['price_new']} desconto de {i['price_cut']}%")
+        except Exception as e:
+            return ['Dados indisponíveis']
 
-    def getGameByIds(self,ids:str = None) -> list:
-        """
-        Retorna todas as vendas dos jogos listados. Máximo de 25 jogos.
-        """
-        return self.supCheapSharkExtractor(path="games?",ids=ids)
-    
-    # store path
+        return price_list
 
-    def getStoreInfo(self) -> list:
-        """
-        Retorna as informções das lojas presentes na api.
-        """
-        return self.supCheapSharkExtractor(path="stores")
+    def getGamePrices(self,gameid: str = None):
+        gamePlain = self.supGetGamePlains(gameid)
+        return self.supGetGamePrices(gamePlain)
