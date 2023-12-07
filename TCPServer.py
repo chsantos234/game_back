@@ -5,7 +5,7 @@ import socket
 
 class Server:
     def __init__(self, host="0.0.0.0", port=8080):
-        self.SENDSIZE = 2048
+        self.SENDSIZE = 8192
         self.host = host
         self.port = port
         self.address = (host, port)
@@ -60,17 +60,15 @@ class Server:
             # recebimento da mensagem do cliente
             while True:
                 try:
-                    resp = (
-                        client_socket.recv(self.SENDSIZE)
-                        .decode("utf-8")
-                        .split("_")
-                    )
+                    resp = client_socket.recv(self.SENDSIZE).decode("utf-8")
+                    #.split("_")
+                    #resp = resp.split("\r\n\r\n", 1)[0].replace('"', '')
+                    print(f"resp aqui {resp} ///")
                     send = self.response_handler(resp)
-
                 # Tratamentos de erros com envio de mensagens personalizadas
-                except IndexError:
-                    send = "Parâmetros estão faltando"
-                    print(send)
+                #except IndexError:
+                #    send = "Parâmetros estão faltando"
+                #    print(send)
                 except KeyError:
                     send = "Comando desconhecido"
                     print(send)

@@ -1,4 +1,5 @@
 import requests
+import urllib.parse
 from env import env
 
 # https://store.steampowered.com/api/appdetails?appids={game-steam-id}d&cc=br general game info (best for overview)
@@ -60,16 +61,18 @@ class Extractor:
     
     # game path
 
-    def getGameByTheme(self,title:str = None,size:int = 60) -> list: # função inicial de pesquisa de jogo
+    def getGameByTheme(self,title:str = None) -> list:
         """
-        Retorna uma lista de jogos baseados em um tema com steam id.
+        Retorna uma lista de jogos baseados em um tema.
         """
-        response = self.supCheapSharkExtractor(path="games?",title=title,size=size)
-
+        print(title)
+        if title: title = urllib.parse.quote(title)
+        response = self.supCheapSharkExtractor(path="games?",title=title,size=60)
         response_id = []
-
+        print(response_id)
         for i in response: 
-            if i['steamAppID'] != None: response_id.append(i)
+            if i['steamAppID'] != None: 
+                response_id.append(f"{i['external']} - {i['steamAppID']}")
 
         return response_id
 
