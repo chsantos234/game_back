@@ -1,6 +1,7 @@
 import requests
 import urllib.parse
 from env import env
+from datetime import datetime
 
 # https://store.steampowered.com/api/appdetails?appids={game-steam-id}d&cc=br general game info (best for overview)
 
@@ -36,7 +37,7 @@ class Extractor:
 
         return requests.get(send).json()
 
-    def supIsThereAnyDealExtractor(self,path,**kwargs) -> list: # to do: add key
+    def supIsThereAnyDealExtractor(self,path,**kwargs) -> list:
 
         send = self.adUrl + path
 
@@ -44,14 +45,6 @@ class Extractor:
             if value != None: send += f"{key}={value}&"
 
         return requests.get(send).json()
-    
-    # deal path
-
-    #def getDealList(self) -> list:
-    #    """
-    #    incompleto.
-    #    """
-    #    return self.supCheapSharkExtractor()
 
     def getDealById(self,id:str = None) -> list:
         """
@@ -78,9 +71,37 @@ class Extractor:
         response = self.supSteamPoweredExtractor(path="appdetails?",appids=appids,cc="br")
         return response[appids]["data"]['detailed_description']
     
-    def getGameLowest(self,gameid:str = None) -> dict: # botão 2
+    def getGameLowest(self,gameid:str = None):
         response = self.supIsThereAnyDealExtractor(path="v01/game/overview/?",key=env("AnyDealKey"),country="BR",shop="steam",ids=f"app/{gameid}")
-        return response
+
+        print(type(response['data'][f"app/{gameid}"]))
+
+        try:
+
+            store_today = response['data'][f"app/{gameid}"]['price']['store']
+            price_today = response['data'][f"app/{gameid}"]['price']['price_formatted']
+
+        except:
+            store_today = None
+            price_today = None
+
+        store_hist = response['data'][f"app/{gameid}"]['lowest']['store']
+        price_hist = response['data'][f"app/{gameid}"]['lowest']['price_formatted']
+
+        price_url = response['data'][f"app/{gameid}"]['urls']['history']
+
+        data_formatada = datetime.utcfromtimestamp(response['data'][f"app/{gameid}"]['lowest']['recorded']).strftime('%d-%m-%Y') # dia do menor preço histórico
+
+        struct = {
+            "store_today":store_today,
+            "price_today":price_today,
+            "store_hist":store_hist,
+            "price_hist":price_hist,
+            "price_url":price_url,
+            "date":data_formatada
+        }
+
+        return struct
     
     # https://api.isthereanydeal.com/v01/game/plain/id/?key={key-here}&shop=steam&ids=app/377160
     
