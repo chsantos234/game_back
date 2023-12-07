@@ -4,7 +4,7 @@ import socket
 
 
 class Server:
-    def __init__(self, host="0.0.0.0", port=8080):
+    def __init__(self, host="localhost", port=8080):
         self.SENDSIZE = 8192
         self.host = host
         self.port = port
@@ -15,7 +15,7 @@ class Server:
             \ndesc_função: descrição de uma função.\
             \nfunção_params: executa função."
         
-    def create_response(status_code, body):
+    def create_response(self,status_code, body):
         response = f"HTTP/1.1 {status_code}\r\n"
         response += "Content-Type: text/html\r\n"
         response += f"Content-Length: {len(body)}\r\n"
@@ -56,14 +56,14 @@ class Server:
             print(f"servidor {self.address} ativo.")
             client_socket, client_address = s.accept()
             print(f"conexão com: {client_address}")
-
             # recebimento da mensagem do cliente
             while True:
+                start_post = False
                 try:
-                    resp = client_socket.recv(self.SENDSIZE).decode("utf-8")
-                    #.split("_")
-                    #resp = resp.split("\r\n\r\n", 1)[0].replace('"', '')
-                    print(f"resp aqui {resp} ///")
+                    data = client_socket.recv(self.SENDSIZE).decode("utf-8")
+                    if data.startswith("POST"): start_post = True
+                    resp = data.split("\r\n\r\n", 1)[1].replace('"', '').split('.')
+                    print(f"resp aqui {resp}")
                     send = self.response_handler(resp)
                 # Tratamentos de erros com envio de mensagens personalizadas
                 #except IndexError:
@@ -83,6 +83,8 @@ class Server:
                     break
 
                 # envio da resposta para o socket cliente
+                if start_post: 
+                    send = self.create_response(200, str(send))
                 client_socket.sendall(str(send).encode("utf-8"))
 
 

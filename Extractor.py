@@ -65,11 +65,9 @@ class Extractor:
         """
         Retorna uma lista de jogos baseados em um tema.
         """
-        print(title)
         if title: title = urllib.parse.quote(title)
         response = self.supCheapSharkExtractor(path="games?",title=title,size=60)
         response_id = []
-        print(response_id)
         for i in response: 
             if i['steamAppID'] != None: 
                 response_id.append(f"{i['external']} - {i['steamAppID']}")
